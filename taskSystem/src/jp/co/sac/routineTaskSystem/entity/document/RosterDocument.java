@@ -1,7 +1,5 @@
 package jp.co.sac.routineTaskSystem.entity.document;
 
-import java.util.Calendar;
-import jp.co.sac.routineTaskSystem.common.DataUtil;
 import jp.co.sac.routineTaskSystem.constant.RosterConst;
 
 /**
@@ -15,13 +13,11 @@ import jp.co.sac.routineTaskSystem.constant.RosterConst;
  */
 public class RosterDocument extends Document<RosterConst.Category, String> {
 
-    private int maxDay;
-    private String rosterYM;
-
+    /**
+     * 内部データの初期化
+     */
     public RosterDocument() {
         super();
-        initializeRosterYM();
-        title = rosterYM + "sac00000";
         for (RosterConst.Category cat : RosterConst.Category.values()) {
             if(RosterConst.Category.haveDay(cat)) {
                 data.put(cat, new String[RosterConst.MAX_DAY]);
@@ -31,29 +27,9 @@ public class RosterDocument extends Document<RosterConst.Category, String> {
         }
     }
 
-    public RosterDocument(String title) {
-        this();
-        if (title != null && title.length() == 14) {
-            setRosterYM(title.substring(0, 6));
-        }
-    }
-
-    private void initializeRosterYM() {
-        Calendar calendar = Calendar.getInstance();
-        StringBuilder sb = new StringBuilder();
-        sb.append(calendar.get(Calendar.YEAR));
-        sb.append(String.format("%02d", calendar.get(Calendar.MONTH) + 1));
-        setRosterYM(sb.toString());
-    }
-
-    @Override
-    public void put(RosterConst.Category key, String[] value) {
-        super.put(key, value);
-    }
-
     @Override
     public void put(RosterConst.Category key, int idx, String str) {
-        if (key == null || idx >= maxDay) {
+        if (key == null || idx >= getMaxDay()) {
             return;
         }
         String[] value = get(key);
@@ -68,13 +44,8 @@ public class RosterDocument extends Document<RosterConst.Category, String> {
     }
 
     @Override
-    public String[] get(RosterConst.Category key) {
-        return super.get(key);
-    }
-
-    @Override
     public String get(RosterConst.Category key, int idx) {
-        if (key == null || idx >= maxDay) {
+        if (key == null || idx >= getMaxDay()) {
             return null;
         }
         String[] value = super.get(key);
@@ -88,50 +59,36 @@ public class RosterDocument extends Document<RosterConst.Category, String> {
         return null;
     }
 
+    /**
+     * 表示用タイトルを取得
+     * 
+     * @return 表示用タイトル
+     */
     @Override
     public String getPrintTitle() {
-        return String.format(title, RosterConst.TITLE, getYear(), getMonth());
-    }
-
-    public final void setRosterYM(String rosterYM) {
-        this.rosterYM = rosterYM;
-        setMaxDay(DataUtil.getMaxDayOfMonth(getYear(), getMonth() - 1));
-    }
-
-    public int getYear() {
-        return Integer.parseInt(rosterYM.substring(0, 4));
-    }
-
-    public int getMonth() {
-        return Integer.parseInt(rosterYM.substring(4));
-    }
-
-    private void setMaxDay(int maxDay) {
-        this.maxDay = maxDay;
-    }
-
-    public int getMaxDay() {
-        return maxDay;
+        return String.format(title == null ? "null" : title, RosterConst.TITLE, getYear(), getMonth());
     }
 
     @Override
     public String getPrintAllForDebug() {
         StringBuilder sb = new StringBuilder();
-        sb.append(" *** デバッグ用 内容表示 *** ").append("\n");
-        sb.append("#title -> ").append(title).append("\n");
-        sb.append("#maxday -> ").append(maxDay).append("\n");
-        sb.append("#rosterYM -> ").append(rosterYM).append("\n");
-        for (RosterConst.Category cat : RosterConst.Category.valuesNoHaveDay()) {
-            sb.append("#").append(cat.toString()).append(" -> ").append(get(cat, 0)).append("\n");
+        sb.append("# title -> ").append(getTitle()).append(System.lineSeparator());
+        sb.append("# extension -> ").append(getExtension()).append(System.lineSeparator());
+        sb.append("# year -> ").append(getYear()).append(System.lineSeparator());
+        sb.append("# month -> ").append(getMonth()).append(System.lineSeparator());
+        sb.append("# maxday -> ").append(getMaxDay()).append(System.lineSeparator());
+        sb.append("# fileError -> ").append(getFileError()).append(System.lineSeparator());
+        sb.append("# data ").append(System.lineSeparator());
+        for (RosterConst.Category key : RosterConst.Category.valuesNoHaveDay()) {
+            sb.append("# ").append(key).append(" -> ").append(get(key, 0)).append(System.lineSeparator());
         }
-        for (int index = 0; index < RosterConst.MAX_DAY; index++) {
-            sb.append("#[").append(index).append("] ");
-            for (RosterConst.Category cat : RosterConst.Category.valuesHaveDay()) {
-                sb.append("#").append(cat.toString()).append(" -> ").append(get(cat, index)).append(" ");
+        for (int idx = 0; idx < getMaxDay(); idx++) {
+            sb.append("# [").append(String.format("%2d", idx)).append("] -> ");
+            for (RosterConst.Category key : RosterConst.Category.valuesHaveDay()) {
+                sb.append(key).append(" : ").append(get(key, idx)).append(" ; ");
             }
-            sb.append("\n");
+            sb.append(System.lineSeparator());
         }
-        sb.append(" ***        ↑↑↑      *** ").append("\n");
         return sb.toString();
     }
 }

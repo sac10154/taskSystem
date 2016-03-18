@@ -2,6 +2,7 @@ package jp.co.sac.routineTaskSystem.entity.findings;
 
 /**
  * 指摘事項クラス
+ * 書類のバリデート情報を保持
  *
  * @author shogo_saito
  */
@@ -10,11 +11,11 @@ public class Findings {
     //指摘事項
     private String message;
 
-    protected Findings() {
+    public Findings() {
         this.message = null;
     }
 
-    protected Findings(String message) {
+    public Findings(String message) {
         this.message = message;
     }
 

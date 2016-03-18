@@ -1,9 +1,11 @@
 package jp.co.sac.routineTaskSystem.constant;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Calendar;
 import java.util.regex.Pattern;
-import jp.co.sac.routineTaskSystem.console.Output;
+import jp.co.sac.routineTaskSystem.log.Output;
+import jp.co.sac.routineTaskSystem.manage.excel.SheetMap;
 
 /**
  *
@@ -11,7 +13,17 @@ import jp.co.sac.routineTaskSystem.console.Output;
  */
 public class Const {
 
+    public static final int MAX_DAY = 31;
     private static Pattern numericPattern = Pattern.compile("\\d+(\\.\\d+)?");
+    public static final String DATE_PATTERN = "yyyy/MM/dd HH:mm:ss";
+    private static boolean isDev = false;
+    private static boolean isDevOK = false;
+
+    public interface Category {
+        public Class getClassOf();
+        public SheetMap getSheetMap();
+        public boolean needIndex();
+    }
 
     public enum Direction {
 
@@ -24,7 +36,8 @@ public class Const {
 
         DEFAULT,
         DATE,
-        TIME_ROSTER;
+        TIME_ROSTER,
+        AUTHOR_NAME_ROSTER;
     }
 
     public enum DayOfWeek {
@@ -158,5 +171,37 @@ public class Const {
 
     public static Pattern getNumericPattern() {
         return numericPattern;
+    }
+
+    public static Class getClassOf(Category category) {
+        if (category != null) {
+            category.getClassOf();
+        }
+        return null;
+    }
+
+    public static boolean isDev() {
+        if (!isDevOK) {
+            String jarPath = System.getProperty("java.class.path");
+            String dirPath = jarPath.substring(0, jarPath.lastIndexOf(File.separator) + 1);
+            if (dirPath.indexOf(";") > 0) {
+//            if (!(System.getProperty("user.dir") + File.separator).equals(dirPath)) {
+                isDev = true;
+            } else {
+                isDev = false;
+            }
+            isDevOK = true;
+        }
+        return isDev;
+    }
+
+    public static String getRootPath() {
+        String jarPath = System.getProperty("java.class.path");
+        String dirPath = jarPath.substring(0, jarPath.lastIndexOf(File.separator) + 1);
+        //IDEで実行時にファイルパスがずれるので、ファイルパスを変更する
+        if (dirPath.indexOf(";") > 0) {
+            dirPath = System.getProperty("user.dir") + File.separator;
+        }
+        return dirPath;
     }
 }

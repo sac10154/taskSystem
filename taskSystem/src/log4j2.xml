@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info">
+
+    <!-- AppenterやLoggerで使用するプロパティを定義する -->
+    <Properties>
+        <Property name="logFileDir">./logs/</Property>
+        <Property name="defaultLayout">[%d{yyyy/MM/dd HH:mm:ss.SSS}], %-5p, %t, %c, %m%n</Property>
+        <Property name="outputLayout">%m%n</Property>
+    </Properties>
+
+    <!-- ログの出力先と出力フォーマットを設定する -->
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${outputLayout}"/>
+        </Console>
+        <Console name="errConsole" target="SYSTEM_OUT">
+            <PatternLayout pattern="${defaultLayout}"/>
+        </Console>
+        <RollingFile name="file" fileName="${logFileDir}taskSystem.log" filePattern="${logFileDir}taskSystem%d{yyyyMMdd}%i.log">
+            <PatternLayout pattern="${outputLayout}"/>
+            <Policies>
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="20 MB" />
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+        <RollingFile name="debugLogFile" fileName="${logFileDir}taskSystem-debug.log" filePattern="${logFileDir}taskSystem-debug%d{yyyyMMdd}%i.log">
+            <PatternLayout pattern="${defaultLayout}"/>
+            <Policies>
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="20 MB" />
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+
+    <!-- パッケージごとにAppenderとログレベルを組み合わせる -->
+    <Loggers>
+        <Logger name="Output" level="info" additivity="false">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="file"/>
+        </Logger>
+        <Logger name="root" level="debug" additivity="false">
+            <AppenderRef ref="debugLogFile"/>
+        </Logger>
+    </Loggers>
+</Configuration>

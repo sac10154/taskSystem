@@ -1,12 +1,9 @@
 package jp.co.sac.routineTaskSystem.constant;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-import jp.co.sac.routineTaskSystem.console.Output;
+import jp.co.sac.routineTaskSystem.log.Output;
 import jp.co.sac.routineTaskSystem.manage.excel.SheetMap;
-import org.apache.poi.ss.usermodel.ExcelStyleDateFormatter;
 
 /**
  * 勤務表の定数
@@ -23,10 +20,14 @@ public class RosterConst {
     public static String HEAD_OFFICE = "本社";
     public static String FILE_NAME_REGEX_PRE = "\\d{6}sacXXXXX";
     public static String FILE_NAME_REGEX = "\\d{6}sac\\d{5}";
+    public static String FILE_NAME_PATTERN = "%ssac%s";
     public static String PRINT_STRING = "%s %4d年 %2d月";
     public static String FORMAT_TIME = "%1$Tk:%1$TM";
     public static String[] File_TYPES = {"xls"};
     public static String[] EXCEPT_CHECK_SUPER_SIGN = {"10154"};
+    public static final SheetMap lookUpStaffIdMap = new SheetMap(55, 8, 1, 300, Const.Direction.DOWN);
+    public static final SheetMap lookUpAuthorNameMap = new SheetMap(56, 8, 1, 300, Const.Direction.DOWN);
+    public static final String LAST_STAFF_ID = "xxxxx";
 
     public static class Cause {
 
@@ -66,7 +67,7 @@ public class RosterConst {
         public static String NO_SIGN_AUTHOR = "記入者サインが未入力";
     }
 
-    public enum Category {
+    public enum Category implements Const.Category {
 
         AuthorName,
         AuthorSign,
@@ -83,7 +84,7 @@ public class RosterConst {
          */
         private static class SheetMaps {
 
-            public static final SheetMap AuthorName = new SheetMap(2, 5, 2, 1, Const.Direction.APOINT);
+            public static final SheetMap AuthorName = new SheetMap(2, 5, 2, 1, Const.Direction.APOINT, Const.CellDataType.AUTHOR_NAME_ROSTER);
             public static final SheetMap AuthorSign = new SheetMap(14, 60, 3, 3, Const.Direction.APOINT);
             public static final SheetMap SuperSign = new SheetMap(11, 60, 3, 3, Const.Direction.APOINT);
             public static final SheetMap WorkLocation = new SheetMap(2, 2, 2, 1, Const.Direction.APOINT);
@@ -92,6 +93,22 @@ public class RosterConst {
             public static final SheetMap TO = new SheetMap(3, 7, 1, 1, Const.Direction.DOWN, Const.CellDataType.TIME_ROSTER);
             public static final SheetMap Cause = new SheetMap(12, 7, 3, 1, Const.Direction.DOWN);
             public static final SheetMap Destination = new SheetMap(13, 7, 3, 1, Const.Direction.DOWN);
+        }
+
+        /*
+         * カテゴリのデータ型
+         */
+        private static class ClassOfData {
+
+            public static final Class AuthorName = String.class;
+            public static final Class AuthorSign = String.class;
+            public static final Class SuperSign = String.class;
+            public static final Class WorkLocation = String.class;
+            public static final Class StaffId = String.class;
+            public static final Class FROM = String.class;
+            public static final Class TO = String.class;
+            public static final Class Cause = String.class;
+            public static final Class Destination = String.class;
         }
 
         /**
@@ -157,11 +174,17 @@ public class RosterConst {
             return categories;
         }
 
-        /**
-         * エクセルシート位置情報の取得
-         *
-         * @return
-         */
+        @Override
+        public Class getClassOf() {
+            try {
+                return (Class)ClassOfData.class.getField(this.toString()).get(null);
+            } catch (IllegalAccessException| IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
+                Output.getInstance().print(ex);
+                return null;
+            }
+        }
+
+        @Override
         public SheetMap getSheetMap() {
             try {
                 return (SheetMap)SheetMaps.class.getField(this.toString()).get(null);
@@ -169,6 +192,11 @@ public class RosterConst {
                 Output.getInstance().print(ex);
                 return null;
             }
+        }
+
+        @Override
+        public boolean needIndex() {
+            return haveDay(this);
         }
     }
 }

@@ -1,18 +1,20 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package jp.co.sac.routineTaskSystem.common;
 
+import java.io.File;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import jp.co.sac.routineTaskSystem.config.GeneralConfig;
+import jp.co.sac.routineTaskSystem.log.Output;
 import jp.co.sac.routineTaskSystem.constant.Const;
 import jp.co.sac.routineTaskSystem.constant.RosterConst;
 import jp.co.sac.routineTaskSystem.entity.document.Document;
+import jp.co.sac.routineTaskSystem.entity.findings.Findings;
 import jp.co.sac.routineTaskSystem.manage.excel.SheetMap;
 
 /**
@@ -22,6 +24,7 @@ import jp.co.sac.routineTaskSystem.manage.excel.SheetMap;
 public final class DataUtil {
     private static Pattern ROSTER_NAME_PATTERN = Pattern.compile(RosterConst.FILE_NAME_REGEX);
     public static Pattern ROSTER_NAME_PATTERN_PRE = Pattern.compile(RosterConst.FILE_NAME_REGEX_PRE);
+    private static SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat(Const.DATE_PATTERN);
 
     public static boolean isNullOrEmpty(Object[] object) {
         return (object == null || object.length == 0);
@@ -73,10 +76,10 @@ public final class DataUtil {
         if (filePath == null) {
             return filePath;
         }
-        String workFilePath = convertToFileNameWithExtensionFromFilePath(filePath);
-        int lastIndex = filePath.indexOf(".");
+        String fileNamePlus = convertToFileNameWithExtensionFromFilePath(filePath);
+        int lastIndex = fileNamePlus.indexOf(".");
         if (lastIndex > 0) {
-            return filePath.substring(0, filePath.indexOf("."));
+            return fileNamePlus.substring(0, lastIndex);
         }
         return filePath;
     }
@@ -113,6 +116,18 @@ public final class DataUtil {
         }
     }
 
+    public static Date convertToDateFromString(String value) {
+        if (value == null) {
+            return null;
+        }
+        try {
+            return DEFAULT_DATE_FORMAT.parse(value);
+        } catch (ParseException ex) {
+            Output.getInstance().println(ex.getMessage());
+            return null;
+        }
+    }
+
     public static String getExtensionFromFilePath(String filePath) {
         if (filePath == null) {
             return filePath;
@@ -124,17 +139,34 @@ public final class DataUtil {
         return filePath;
     }
 
+    public static String getFilePath(Document document) {
+        if (document == null) {
+            return null;
+        }
+        String ret;
+        if (isNullOrEmpty(document.getDirPath())) {
+            ret = GeneralConfig.getOutputPath();
+        } else {
+            ret = document.getDirPath();
+        }
+        return ret + File.separator + document.getFileNameAndExtension();
+    }
+
     public static int getMaxDayOfMonth(int month) {
         return getMaxDayOfMonth(null, month);
     }
 
     public static int getMaxDayOfMonth(Integer year, int month) {
-        Calendar cal = Calendar.getInstance();
-        if (year == null) {
-            year = cal.get(Calendar.YEAR);
+        try {
+            Calendar cal = Calendar.getInstance();
+            if (year == null) {
+                year = cal.get(Calendar.YEAR);
+            }
+            cal.set(year, month, 1);
+            return cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        } catch (Exception ex) {
+            return Const.MAX_DAY;
         }
-        cal.set(year, month, 1);
-        return cal.getActualMaximum(Calendar.DAY_OF_MONTH);
     }
 
     public static int getDayOfWeekInt(Integer year, Integer month, int day) {
@@ -203,5 +235,16 @@ public final class DataUtil {
 
     public static boolean isTimeRoster(SheetMap sheetMap) {
         return sheetMap != null && Const.CellDataType.TIME_ROSTER.equals(sheetMap.getType());
+    }
+
+    public static boolean hasNotValidDocument(Map<Document, List<Findings>> docsMap) {
+        if (docsMap != null && docsMap.values() != null) {
+            for (List<Findings> finds : docsMap.values()) {
+                if (finds != null && !finds.isEmpty()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

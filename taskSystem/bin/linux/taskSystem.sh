@@ -2,7 +2,6 @@
 
 # 環境変数読み込み
 . bin/setEnv.sh
-echo $JAVA_HOME
 
 while [ "$1" != "" ]
 do

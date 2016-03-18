@@ -8,15 +8,23 @@ import jp.co.sac.routineTaskSystem.constant.Const.CellDataType;
 import jp.co.sac.routineTaskSystem.constant.Const.Direction;
 
 /**
+ * Excelシートの位置情報クラス
+ * 定数として宣言して読み書きに利用する想定
  *
  * @author shogo_saito
  */
 public class SheetMap {
+    //横位置
     private int pstCol;
+    //縦位置
     private int pstRow;
+    //範囲・横
     private int rngCol;
+    //範囲・縦
     private int rngRow;
+    //方向
     private Direction direct;
+    //セルのデータタイプ
     private CellDataType type;
 
     public SheetMap() {
@@ -28,6 +36,15 @@ public class SheetMap {
         type = null;
     }
 
+    /**
+     * 位置・範囲・方向を指定して初期化
+     * 
+     * @param pstCol 横位置
+     * @param pstRow 縦位置
+     * @param rngCol 範囲・横
+     * @param rngRow 範囲・縦
+     * @param direct 方向
+     */
     public SheetMap(int pstCol, int pstRow, int rngCol, int rngRow, Direction direct) {
         this.pstCol = pstCol;
         this.pstRow = pstRow;
@@ -37,6 +54,16 @@ public class SheetMap {
         this.type = CellDataType.DEFAULT;
     }
 
+    /**
+     * 位置・範囲・方向・データタイプを指定して初期化
+     * 
+     * @param pstCol 横位置
+     * @param pstRow 縦位置
+     * @param rngCol 範囲・横
+     * @param rngRow 範囲・縦
+     * @param direct 方向
+     * @param type セルのデータタイプ
+     */
     public SheetMap(int pstCol, int pstRow, int rngCol, int rngRow, Direction direct,CellDataType type) {
         this.pstCol = pstCol;
         this.pstRow = pstRow;
@@ -50,7 +77,7 @@ public class SheetMap {
         return pstCol;
     }
 
-    public void setPstCol(int pstCol) {
+    protected void setPstCol(int pstCol) {
         this.pstCol = pstCol;
     }
 
@@ -58,7 +85,7 @@ public class SheetMap {
         return pstRow;
     }
 
-    public void setPstRow(int pstRow) {
+    protected void setPstRow(int pstRow) {
         this.pstRow = pstRow;
     }
 
@@ -66,7 +93,7 @@ public class SheetMap {
         return rngCol;
     }
 
-    public void setRngCol(int rngCol) {
+    protected void setRngCol(int rngCol) {
         this.rngCol = rngCol;
     }
 
@@ -74,7 +101,7 @@ public class SheetMap {
         return rngRow;
     }
 
-    public void setRngRow(int rngRow) {
+    protected void setRngRow(int rngRow) {
         this.rngRow = rngRow;
     }
 
@@ -82,7 +109,7 @@ public class SheetMap {
         return direct;
     }
 
-    public void setDirect(Direction direct) {
+    protected void setDirect(Direction direct) {
         this.direct = direct;
     }
 
@@ -90,7 +117,7 @@ public class SheetMap {
         return type;
     }
 
-    public void setType(CellDataType type) {
+    protected void setType(CellDataType type) {
         this.type = type;
     }
     
