@@ -1,10 +1,10 @@
 @echo off
 
-Rem JAVA迺ｰ蠅�螟画焚繧貞ｮ夂ｾｩ縺吶ｋ
-set JAVA_HOME=C:\Program Files\Java\jdk1.7.0_65
-set PATH=C:\Program Files\Java\jdk1.7.0_65\bin
+Rem JAVA環境変数を定義する
+set JAVA_HOME=C:\Program Files\Java\jdk1.7.0_79
+set PATH=%JAVA_HOME%\bin
 
-Rem 繧ｯ繝ｩ繧ｹ繝代せ
-set CLASSPATH=conf\;dist\taskSystem.jar;dist\lib\*
+Rem クラスパス
+set CLASSPATH=conf\;lib\*
 
 exit /B 0

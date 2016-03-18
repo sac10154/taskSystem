@@ -1,10 +1,10 @@
 @echo off
 
-Rem ç’°å¢ƒå¤‰æ•°èª­ã¿è¾¼ã¿
+Rem ŠÂ‹«•Ï”“Ç‚İ‚İ
 cd  %~dp0\..
 call bin\setEnv.bat
 
-Rem å®Ÿè¡Œ
+Rem Às
 java -cp "%CLASSPATH%" jp.co.sac.routineTaskSystem.main.TaskSystem %*
 
 exit /b %errorlevel%
